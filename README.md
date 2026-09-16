@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QRForge
 
-## Getting Started
+A full-stack QR code generator SaaS: create static and dynamic QR codes (URL, WiFi, vCard, email,
+SMS, phone, app store smart links, PDF), track scans, customize branding, generate in bulk, and
+call a REST API — gated by Free / Pro / Business subscription plans billed through Stripe.
 
-First, run the development server:
+## Tech stack
+
+- **Framework**: Next.js 16 (App Router) + TypeScript
+- **Database**: PostgreSQL via Prisma (Neon, Supabase, Aiven, RDS, or `docker-compose.yml` locally)
+- **Auth**: Auth.js v5 — email/password out of the box, Google OAuth optional
+- **Payments**: Stripe Checkout + Customer Portal + webhooks
+- **UI**: Tailwind CSS + shadcn/ui (Base UI primitives)
+- **QR engine**: `qrcode` (matrix) + a custom SVG renderer (styling/logo/frame) + `sharp` (PNG) +
+  `pdf-lib` (PDF) — no native-canvas build step required
+- **Testing**: Vitest (unit) + Playwright (e2e, scaffolding provided)
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env   # then set DATABASE_URL to your Postgres connection string
+npx prisma migrate dev
+npm run db:seed        # optional demo data: demo@qrforge.dev / password123
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Email/password sign-up works immediately — no external accounts
+beyond Postgres are needed to try the product end to end (QR creation, dynamic redirects, scan
+analytics, bulk generation, API keys).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See `.env.example` for the full list. Nothing is required to run locally beyond `DATABASE_URL`,
+`AUTH_SECRET`, and `NEXTAUTH_URL` (already filled in). Everything else degrades gracefully when
+unset:
 
-## Learn More
+- **Google OAuth** (`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`) — when unset, the "Continue with
+  Google" button is hidden and only email/password auth is offered.
+- **Stripe** (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
+  `STRIPE_PRICE_ID_PRO`, `STRIPE_PRICE_ID_BUSINESS`) — when unset, the billing page shows a "not
+  configured" banner and upgrade buttons are disabled instead of erroring.
 
-To learn more about Next.js, take a look at the following resources:
+### Setting up Stripe (optional, for real billing)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Create a Stripe account and switch to test mode.
+2. Create two recurring Products/Prices (Pro, Business) and copy their price IDs into
+   `STRIPE_PRICE_ID_PRO` / `STRIPE_PRICE_ID_BUSINESS`.
+3. Copy your test **Secret key** into `STRIPE_SECRET_KEY` and **Publishable key** into
+   `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
+4. Run `stripe listen --forward-to localhost:3000/api/webhooks/stripe` (Stripe CLI) and copy the
+   printed signing secret into `STRIPE_WEBHOOK_SECRET`.
+5. Restart the dev server.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Setting up Google OAuth (optional)
 
-## Deploy on Vercel
+Create an OAuth client in the Google Cloud Console with redirect URI
+`http://localhost:3000/api/auth/callback/google`, then set `GOOGLE_CLIENT_ID` /
+`GOOGLE_CLIENT_SECRET`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Database
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`DATABASE_URL` points at any PostgreSQL instance — a managed one (Neon, Supabase, Aiven, RDS) for
+either local dev or production, or run the included `docker-compose.yml` (`docker compose up -d`)
+for a fully local Postgres. Run `npx prisma migrate dev` after changing it to apply the schema.
+
+## Project structure
+
+```
+src/
+  app/
+    (auth)/            sign-in / sign-up pages + actions
+    dashboard/          the authenticated app (QR CRUD, analytics, billing, bulk, API keys, settings)
+    r/[shortCode]/       public redirect/landing page for dynamic QR codes (scan tracking lives here)
+    api/                 REST endpoints: QR export, preview, bulk zip, Stripe webhook, public v1 API
+    pricing/, docs/api/  marketing + API documentation pages
+  lib/
+    qr/                  the QR engine: matrix generation, SVG styling, encoders, export, analytics
+    plans.ts, plan-limits.ts   subscription tier definitions + enforcement
+    validations/         zod schemas
+prisma/
+  schema.prisma          data model
+  seed.ts                demo data
+```
+
+## Testing
+
+```bash
+npm run test        # Vitest unit tests (QR engine, CSV parsing, plan logic)
+npm run test:e2e     # Playwright e2e (requires `npm run dev` running separately)
+npm run lint
+npx tsc --noEmit
+```
+
+## Subscription plans
+
+| | Free | Pro | Business |
+|---|---|---|---|
+| QR codes | 5 | Unlimited | Unlimited |
+| Dynamic (trackable) QR codes | 1 | Unlimited | Unlimited |
+| Custom branding (colors/logo/frame) | – | ✓ | ✓ |
+| Bulk CSV generation | – | ✓ | ✓ |
+| REST API access | – | – | ✓ (5 keys) |
+
+Plan limits are defined in [`src/lib/plans.ts`](src/lib/plans.ts) and enforced in
+[`src/lib/plan-limits.ts`](src/lib/plan-limits.ts).

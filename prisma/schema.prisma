@@ -1,0 +1,147 @@
+// Prisma schema for the QR SaaS app.
+// Uses PostgreSQL — set DATABASE_URL in .env to a real Postgres instance
+// (e.g. Neon, Supabase, Aiven, or the provided docker-compose.yml for local dev).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  hashedPassword String?
+  image          String?
+  emailVerified  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Subscription / billing
+  plan                   String    @default("FREE") // FREE | PRO | BUSINESS
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  stripeSubscriptionStatus String? // active | trialing | past_due | canceled | ...
+
+  accounts    Account[]
+  sessions    Session[]
+  qrCodes     QrCode[]
+  apiKeys     ApiKey[]
+  usageCounters UsageCounter[]
+}
+
+// Auth.js (NextAuth v5) adapter models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// A single QR code owned by a user. Static codes bake the content directly
+// into the image; dynamic codes point at /r/[shortCode], which looks up
+// `targetPayload` at scan time (so the destination can change without
+// reprinting the code) and records a ScanEvent.
+model QrCode {
+  id         String  @id @default(cuid())
+  ownerId    String
+  name       String
+  type       String // URL | VCARD | WIFI | TEXT | EMAIL | SMS | PHONE | APP_LINK | PDF
+  isDynamic  Boolean @default(false)
+  shortCode  String? @unique // present only when isDynamic
+
+  // JSON-encoded content payload, shape depends on `type`.
+  targetPayload String
+
+  // JSON-encoded visual design: colors, dot/corner style, logo data URL, frame/CTA text.
+  design String
+
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  scanEvents ScanEvent[]
+
+  @@index([ownerId])
+}
+
+model ScanEvent {
+  id         String   @id @default(cuid())
+  qrCodeId   String
+  timestamp  DateTime @default(now())
+  country    String?
+  deviceType String? // desktop | mobile | tablet | other
+  os         String?
+  browser    String?
+  referrer   String?
+
+  qrCode QrCode @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+
+  @@index([qrCodeId, timestamp])
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  ownerId    String
+  label      String
+  hashedKey  String    @unique
+  keyPrefix  String // first chars shown in UI, e.g. "qr_live_ab12"
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+}
+
+// One row per user per calendar-month period ("2026-09"), incremented as
+// actions happen and compared against lib/plan-limits.ts ceilings.
+model UsageCounter {
+  id             String @id @default(cuid())
+  ownerId        String
+  period         String
+  dynamicQrCount Int    @default(0)
+  scanCount      Int    @default(0)
+  apiCallCount   Int    @default(0)
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, period])
+}

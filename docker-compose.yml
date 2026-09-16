@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: qr_saas
+      POSTGRES_PASSWORD: qr_saas
+      POSTGRES_DB: qr_saas
+    ports:
+      - "5432:5432"
+    volumes:
+      - qr_saas_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  qr_saas_postgres_data:
