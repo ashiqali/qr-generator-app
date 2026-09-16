@@ -19,17 +19,26 @@ export function MobileNav() {
           </Button>
         }
       />
-      <SheetContent side="left" className="w-64 p-4">
-        <SheetTitle className="flex items-center gap-2 font-semibold">
-          <QrCode className="size-6" />
-          QRForge
+      <SheetContent side="left" className="w-72 p-5">
+        <SheetTitle className="flex items-center gap-3">
+          <div className="flex size-8 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <QrCode className="size-4" />
+          </div>
+          <span className="font-heading font-bold">QRForge</span>
         </SheetTitle>
-        <div className="mt-6" onClick={() => setOpen(false)}>
+        <div className="mt-8" onClick={() => setOpen(false)}>
           <DashboardNav />
         </div>
-        <Link href="/dashboard/billing" onClick={() => setOpen(false)} className="mt-6 block text-sm text-primary underline underline-offset-4">
-          Manage billing
-        </Link>
+        <div className="mt-8 border-t border-border pt-4">
+          <Link
+            href="/dashboard/billing"
+            onClick={() => setOpen(false)}
+            className="flex items-center justify-between text-xs font-medium text-primary hover:underline"
+          >
+            <span>Subscription & Billing</span>
+            <span>&rarr;</span>
+          </Link>
+        </div>
       </SheetContent>
     </Sheet>
   );
