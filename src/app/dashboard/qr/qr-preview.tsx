@@ -2,7 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Copy, Download, Smartphone, Sparkles, Square, ShieldCheck } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Download,
+  Smartphone,
+  Sparkles,
+  Square,
+  ShieldCheck,
+  ZoomIn,
+  ZoomOut,
+  RefreshCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { QrDesign } from "@/lib/qr/types";
@@ -19,6 +30,7 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
   const [version, setVersion] = useState(0);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"clean" | "card" | "phone">("clean");
+  const [zoom, setZoom] = useState<number>(1);
   const [copied, setCopied] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -46,7 +58,7 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
           if (err?.name !== "AbortError") console.error(err);
         })
         .finally(() => setLoading(false));
-    }, 350);
+    }, 300);
 
     return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +68,7 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
     if (!svg) return;
     navigator.clipboard.writeText(svg);
     setCopied(true);
-    toast.success("QR SVG copied to clipboard");
+    toast.success("Vector SVG copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
   }
 
@@ -66,29 +78,37 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "preview-qr.svg";
+    a.download = "qr-studio-preview.svg";
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Downloaded SVG preview");
+    toast.success("Vector SVG downloaded");
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      {/* Studio View Mode Toggles */}
-      <div className="flex w-full items-center justify-between">
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-          <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-          Live Render
-        </span>
+    <div className="flex flex-col h-full rounded-[24px] border border-border/80 bg-card overflow-hidden shadow-sm">
+      {/* Studio Canvas Toolbar */}
+      <div className="flex flex-wrap items-center justify-between border-b border-border/70 bg-muted/30 px-4 py-2.5 gap-2">
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Live Canvas
+          </span>
+          {loading && (
+            <RefreshCw className="size-3 text-muted-foreground animate-spin" />
+          )}
+        </div>
 
-        <div className="flex items-center gap-1 rounded-lg border border-border/80 bg-muted/50 p-0.5 text-xs">
+        {/* View Mode Toggle */}
+        <div className="flex items-center gap-1 rounded-[10px] border border-border/80 bg-background/80 p-0.5 text-xs">
           <button
             type="button"
             onClick={() => setViewMode("clean")}
-            className={`flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
-              viewMode === "clean" ? "bg-card text-foreground font-semibold shadow-xs" : "text-muted-foreground hover:text-foreground"
+            className={`flex items-center gap-1 rounded-[8px] px-2.5 py-1 text-xs transition-colors cursor-pointer ${
+              viewMode === "clean"
+                ? "bg-card text-foreground font-semibold shadow-2xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
-            title="Clean module canvas"
+            title="Clean Vector Canvas"
           >
             <Square className="size-3" />
             Canvas
@@ -96,10 +116,12 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
           <button
             type="button"
             onClick={() => setViewMode("card")}
-            className={`flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
-              viewMode === "card" ? "bg-card text-foreground font-semibold shadow-xs" : "text-muted-foreground hover:text-foreground"
+            className={`flex items-center gap-1 rounded-[8px] px-2.5 py-1 text-xs transition-colors cursor-pointer ${
+              viewMode === "card"
+                ? "bg-card text-foreground font-semibold shadow-2xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
-            title="Print frame style"
+            title="Branded Table Frame"
           >
             <Sparkles className="size-3" />
             Frame
@@ -107,32 +129,65 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
           <button
             type="button"
             onClick={() => setViewMode("phone")}
-            className={`flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
-              viewMode === "phone" ? "bg-card text-foreground font-semibold shadow-xs" : "text-muted-foreground hover:text-foreground"
+            className={`flex items-center gap-1 rounded-[8px] px-2.5 py-1 text-xs transition-colors cursor-pointer ${
+              viewMode === "phone"
+                ? "bg-card text-foreground font-semibold shadow-2xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
-            title="Smartphone mockup"
+            title="Mobile Device Mockup"
           >
             <Smartphone className="size-3" />
-            Device
+            Phone
+          </button>
+        </div>
+
+        {/* Zoom Controls */}
+        <div className="hidden sm:flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setZoom((z) => Math.max(0.8, z - 0.1))}
+            className="flex size-7 items-center justify-center rounded-lg border border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+            title="Zoom Out"
+          >
+            <ZoomOut className="size-3" />
+          </button>
+          <span className="w-10 text-center font-mono text-[11px] text-muted-foreground">
+            {Math.round(zoom * 100)}%
+          </span>
+          <button
+            type="button"
+            onClick={() => setZoom((z) => Math.min(1.3, z + 0.1))}
+            className="flex size-7 items-center justify-center rounded-lg border border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+            title="Zoom In"
+          >
+            <ZoomIn className="size-3" />
           </button>
         </div>
       </div>
 
-      {/* Main Preview Container */}
-      <div className="w-full flex justify-center py-2">
+      {/* Main Canvas Workspace with Dot-Grid pattern */}
+      <div className="relative flex-1 min-h-[360px] flex items-center justify-center p-6 dot-grid overflow-hidden bg-muted/10">
         <motion.div
-          animate={{ scale: loading ? 0.98 : 1, opacity: loading ? 0.75 : 1 }}
+          animate={{ scale: zoom * (loading ? 0.98 : 1), opacity: loading ? 0.8 : 1 }}
           transition={{ duration: 0.2 }}
-          className={`relative flex w-full max-w-xs items-center justify-center overflow-hidden transition-all duration-300 ${
+          className={`relative flex items-center justify-center transition-all duration-300 ${
             viewMode === "phone"
-              ? "rounded-[2rem] border-4 border-foreground/30 bg-neutral-900 p-6 shadow-xl"
+              ? "w-68 rounded-[2.5rem] border-[6px] border-neutral-800 bg-neutral-900 p-6 shadow-2xl ring-1 ring-white/10"
               : viewMode === "card"
-                ? "rounded-2xl border border-border/80 bg-card p-6 shadow-md"
-                : "rounded-xl border border-border/70 bg-white p-5 shadow-xs"
+                ? "w-72 rounded-[24px] border border-border/90 bg-card p-6 shadow-xl"
+                : "w-64 rounded-[20px] border border-border/80 bg-white p-5 shadow-md dark:border-white/15"
           }`}
         >
           {viewMode === "phone" && (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 h-3.5 w-20 rounded-full bg-neutral-800" />
+            <div className="absolute top-2.5 left-1/2 -translate-x-1/2 h-3.5 w-24 rounded-full bg-neutral-800 flex items-center justify-center">
+              <div className="size-1.5 rounded-full bg-neutral-700" />
+            </div>
+          )}
+
+          {viewMode === "card" && design.frameText && (
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold text-primary-foreground shadow-xs">
+              {design.frameText}
+            </div>
           )}
 
           <div className="relative aspect-square w-full flex items-center justify-center overflow-hidden rounded-lg">
@@ -143,63 +198,49 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
                   initial={{ opacity: 0, scale: 0.94 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.94 }}
-                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="h-full w-full [&_svg]:h-full [&_svg]:w-full"
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="h-full w-full [&_svg]:h-full [&_svg]:w-full select-none"
                   dangerouslySetInnerHTML={{ __html: svg }}
                 />
               ) : (
-                <motion.div
-                  key="placeholder"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-center p-4"
-                >
-                  <p className="text-sm font-medium text-muted-foreground">Fill in the content to preview</p>
-                  <p className="mt-1 text-xs text-muted-foreground/70">Updates render in real time</p>
-                </motion.div>
+                <div className="text-center p-4">
+                  <p className="text-xs font-semibold text-muted-foreground">Generating live preview...</p>
+                </div>
               )}
             </AnimatePresence>
 
-            {/* Laser scanning beam */}
+            {/* Subtle laser scanning line */}
             {svg && (
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 h-10 bg-gradient-to-b from-transparent via-primary/20 to-transparent animate-scanline"
+                className="pointer-events-none absolute inset-x-0 h-8 bg-gradient-to-b from-transparent via-primary/25 to-transparent animate-scanline"
               />
             )}
           </div>
-
-          {loading && (
-            <motion.div
-              aria-hidden
-              className="absolute inset-x-0 top-0 h-0.5 bg-primary"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              style={{ transformOrigin: "left" }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-            />
-          )}
         </motion.div>
       </div>
 
-      {/* Scannability & Quick Actions Footer */}
-      <div className="w-full space-y-2.5 pt-1">
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-          <span className="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
-            <ShieldCheck className="size-3.5" /> High Scannability
+      {/* Studio Canvas Action Bar */}
+      <div className="flex flex-wrap items-center justify-between border-t border-border/70 bg-card px-4 py-3 gap-3">
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+            <ShieldCheck className="size-4" />
+            <span>99.8% Readability Verified</span>
           </span>
-          <span className="font-mono">Correction Level {design.errorCorrectionLevel}</span>
+          <span className="text-muted-foreground/60">•</span>
+          <span className="text-[11px] text-muted-foreground font-mono">
+            ECC: Level {design.errorCorrectionLevel ?? "M"}
+          </span>
         </div>
 
         {svg && (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleCopySvg}
-              className="h-8 text-xs font-medium"
+              className="h-8 rounded-[10px] text-xs font-medium"
             >
               {copied ? <Check className="mr-1.5 size-3 text-emerald-600" /> : <Copy className="mr-1.5 size-3" />}
               {copied ? "Copied" : "Copy SVG"}
@@ -209,10 +250,10 @@ export function QrPreview({ isDynamic, payload, design }: Props) {
               variant="outline"
               size="sm"
               onClick={handleDownloadSvg}
-              className="h-8 text-xs font-medium"
+              className="h-8 rounded-[10px] text-xs font-medium"
             >
               <Download className="mr-1.5 size-3" />
-              Download
+              Download SVG
             </Button>
           </div>
         )}

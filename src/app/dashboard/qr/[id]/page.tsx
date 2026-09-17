@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Pencil, Download, ArrowLeft, ExternalLink, QrCode as QrIcon } from "lucide-react";
+import { Pencil, Download, ArrowLeft } from "lucide-react";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { CopyButton } from "@/components/copy-button";
 import { ScanTrendChart } from "@/components/scan-trend-chart";
 import { BreakdownList } from "@/components/breakdown-list";
 import { getScanTimeSeries, getDeviceBreakdown, getCountryBreakdown } from "@/lib/qr/analytics";
-import { QR_TYPE_META, QrTypeIcon } from "../qr-type-icon";
+import { QR_TYPE_META } from "../qr-type-icon";
 import { QrDetailActions } from "./qr-detail-actions";
 import type { QrContentType } from "@/lib/qr/types";
 import { FadeIn } from "@/components/motion/fade-in";
@@ -56,9 +56,9 @@ export default async function QrDetailPage({ params }: { params: Promise<{ id: s
               <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                 {qr.name}
               </h1>
-              <Badge variant={qr.isDynamic ? "default" : "secondary"} className="h-6 px-2.5">
+              <Badge variant={qr.isDynamic ? "default" : "secondary"} className="h-6 px-2.5 rounded-full">
                 {qr.isDynamic ? (
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 font-bold">
                     <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Dynamic
                   </span>
@@ -68,29 +68,34 @@ export default async function QrDetailPage({ params }: { params: Promise<{ id: s
               </Badge>
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">{typeMeta?.label}</span>
+              <span className="font-semibold text-foreground">{typeMeta?.label}</span>
               <span>•</span>
               <span>Created {new Date(qr.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button render={<Link href={`/dashboard/qr/${qr.id}/edit`} />} size="sm" variant="outline" className="h-9 px-3.5">
-              <Pencil className="mr-1.5 size-3.5" /> Edit
+            <Button
+              render={<Link href={`/dashboard/qr/${qr.id}/edit`} />}
+              size="sm"
+              variant="outline"
+              className="h-9 px-3.5 rounded-[12px] text-xs font-semibold"
+            >
+              <Pencil className="mr-1.5 size-3.5" /> Edit Destination
             </Button>
             <QrDetailActions id={qr.id} />
           </div>
         </div>
       </FadeIn>
 
-      <StaggerContainer immediate className="grid gap-6 lg:grid-cols-[300px_1fr]">
+      <StaggerContainer immediate className="grid gap-6 lg:grid-cols-[320px_1fr]">
         {/* Left Column: QR Asset Card */}
         <StaggerItem>
-          <Card className="card-sheen elevated-card rounded-2xl border border-border/80 shadow-xs">
+          <Card className="rounded-[24px] border border-border/80 shadow-2xs">
             <CardHeader className="border-b border-border/60 pb-3">
-              <CardTitle className="font-heading text-sm font-semibold">Production Asset</CardTitle>
+              <CardTitle className="font-heading text-sm font-bold">Production Vector Asset</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4 pt-5">
-              <div className="relative flex aspect-square w-full items-center justify-center rounded-xl border border-border/80 bg-white p-4 shadow-inner">
+              <div className="relative flex aspect-square w-full items-center justify-center rounded-[20px] border border-border/80 bg-white p-5 shadow-2xs">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/api/qr/${qr.id}/export?format=png`}
@@ -100,24 +105,39 @@ export default async function QrDetailPage({ params }: { params: Promise<{ id: s
               </div>
 
               {shortUrl && (
-                <div className="w-full space-y-1.5 rounded-xl border border-border/80 bg-muted/40 p-3 text-center">
+                <div className="w-full space-y-1.5 rounded-[16px] border border-border/80 bg-muted/40 p-3 text-center">
                   <p className="truncate text-xs text-muted-foreground font-mono">{shortUrl}</p>
-                  <CopyButton value={shortUrl} label="Copy short link" />
+                  <CopyButton value={shortUrl} label="Copy dynamic short-link" />
                 </div>
               )}
 
-              <div className="w-full space-y-2">
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  Download Formats
+              <div className="w-full space-y-2 pt-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Download Ready Formats
                 </p>
                 <div className="grid w-full grid-cols-3 gap-2">
-                  <Button render={<a href={`/api/qr/${qr.id}/export?format=png`} download />} size="sm" variant="outline" className="h-8 text-xs font-semibold">
+                  <Button
+                    render={<a href={`/api/qr/${qr.id}/export?format=png`} download />}
+                    size="sm"
+                    variant="outline"
+                    className="h-8.5 text-xs font-semibold rounded-[10px]"
+                  >
                     <Download className="mr-1 size-3" /> PNG
                   </Button>
-                  <Button render={<a href={`/api/qr/${qr.id}/export?format=svg`} download />} size="sm" variant="outline" className="h-8 text-xs font-semibold">
+                  <Button
+                    render={<a href={`/api/qr/${qr.id}/export?format=svg`} download />}
+                    size="sm"
+                    variant="outline"
+                    className="h-8.5 text-xs font-semibold rounded-[10px]"
+                  >
                     <Download className="mr-1 size-3" /> SVG
                   </Button>
-                  <Button render={<a href={`/api/qr/${qr.id}/export?format=pdf`} download />} size="sm" variant="outline" className="h-8 text-xs font-semibold">
+                  <Button
+                    render={<a href={`/api/qr/${qr.id}/export?format=pdf`} download />}
+                    size="sm"
+                    variant="outline"
+                    className="h-8.5 text-xs font-semibold rounded-[10px]"
+                  >
                     <Download className="mr-1 size-3" /> PDF
                   </Button>
                 </div>
@@ -128,22 +148,36 @@ export default async function QrDetailPage({ params }: { params: Promise<{ id: s
 
         {/* Right Column: Performance & Telemetry */}
         <StaggerItem className="space-y-6">
-          <Card className="card-sheen rounded-2xl border border-border/80 shadow-xs">
+          <Card className="rounded-[24px] border border-border/80 shadow-2xs">
             <CardHeader className="border-b border-border/60 pb-4">
-              <CardTitle className="font-heading text-base font-bold">
-                {qr.isDynamic ? "Scan Velocity (Last 30 Days)" : "Analytics"}
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="font-heading text-base font-bold">
+                  {qr.isDynamic ? "Scan Velocity (Last 30 Days)" : "Static QR Code"}
+                </CardTitle>
+                {qr.isDynamic && (
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
+                    {qr._count.scanEvents.toLocaleString()} Scans
+                  </span>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="pt-5">
               {qr.isDynamic ? (
                 <ScanTrendChart data={series} />
               ) : (
-                <div className="rounded-xl border border-dashed border-border/80 bg-muted/20 p-6 text-center">
-                  <p className="text-sm font-semibold text-foreground">Analytics Unavailable for Static Codes</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Static QR codes encode data directly into the pixel matrix. Convert this code to
-                    Dynamic in Edit mode to route through our telemetry engine.
+                <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-sm text-muted-foreground">
+                  <p className="font-semibold text-foreground text-xs">No scan analytics for static codes</p>
+                  <p className="max-w-md text-xs">
+                    Static codes encode data directly into the pixel pattern. Convert to a dynamic QR code anytime to track scans and edit destinations.
                   </p>
+                  <Button
+                    render={<Link href="/dashboard/billing" />}
+                    size="sm"
+                    variant="outline"
+                    className="mt-3 rounded-[12px] text-xs font-semibold"
+                  >
+                    Upgrade for Dynamic Analytics
+                  </Button>
                 </div>
               )}
             </CardContent>
@@ -151,31 +185,18 @@ export default async function QrDetailPage({ params }: { params: Promise<{ id: s
 
           {qr.isDynamic && (
             <div className="grid gap-6 sm:grid-cols-2">
-              <Card className="card-sheen rounded-2xl border border-border/80 shadow-xs">
-                <CardContent className="pt-6">
-                  <BreakdownList title="Top Devices" items={devices.map((d) => ({ label: d.label, count: d.count }))} />
+              <Card className="rounded-[24px] border border-border/80 shadow-2xs">
+                <CardContent className="pt-5">
+                  <BreakdownList title="Device Types" items={devices} />
                 </CardContent>
               </Card>
-              <Card className="card-sheen rounded-2xl border border-border/80 shadow-xs">
-                <CardContent className="pt-6">
-                  <BreakdownList
-                    title="Top Countries"
-                    items={countries.map((c) => ({ label: c.label, count: c.count }))}
-                    emptyLabel="No location events recorded yet"
-                  />
+              <Card className="rounded-[24px] border border-border/80 shadow-2xs">
+                <CardContent className="pt-5">
+                  <BreakdownList title="Top Countries" items={countries} />
                 </CardContent>
               </Card>
             </div>
           )}
-
-          <Card className="rounded-xl border border-border/70 bg-card/60">
-            <CardContent className="pt-5 pb-5 text-sm text-muted-foreground flex items-center justify-between">
-              <span>Verified lifetime events</span>
-              <span className="font-medium text-foreground">
-                Total scans: {qr._count.scanEvents}
-              </span>
-            </CardContent>
-          </Card>
         </StaggerItem>
       </StaggerContainer>
     </div>

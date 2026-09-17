@@ -1,5 +1,20 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, Braces, Check, Globe2, Layers3, MousePointerClick, Palette, QrCode, ScanLine, ShieldCheck, Sparkles, Upload, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  Braces,
+  Check,
+  Globe2,
+  Layers3,
+  MousePointerClick,
+  Palette,
+  QrCode,
+  ScanLine,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingHeader } from "@/components/marketing-header";
 import { MarketingFooter } from "@/components/marketing-footer";
@@ -10,45 +25,361 @@ import { StaggerContainer, StaggerItem } from "@/components/motion/stagger";
 const formats = ["Website", "WiFi", "vCard", "PDF", "Email", "SMS", "App link"];
 
 export default function Home() {
-  return <div className="flex min-h-svh flex-col overflow-hidden bg-[#f6f4ee]">
-    <MarketingHeader />
-    <main className="flex-1">
-      <section className="relative border-b border-foreground/10">
-        <div className="paper-grid absolute inset-0 opacity-60" aria-hidden />
-        <div className="pointer-events-none absolute -top-24 right-[-10rem] size-[34rem] rounded-full bg-[#d9e7d3] blur-[100px]" aria-hidden />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-6 py-20 lg:grid-cols-[1.15fr_.85fr] lg:py-28">
-          <StaggerContainer immediate className="max-w-3xl">
-            <StaggerItem className="mb-7 flex items-center gap-3"><span className="h-px w-10 bg-primary" /><span className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">QR infrastructure for modern teams</span></StaggerItem>
-            <StaggerItem><h1 className="font-heading text-[clamp(3.5rem,7vw,6.8rem)] leading-[.88] font-semibold tracking-[-0.065em] text-balance">Make every scan <span className="font-serif font-normal italic text-primary">count.</span></h1></StaggerItem>
-            <StaggerItem><p className="mt-8 max-w-xl text-lg leading-8 text-muted-foreground sm:text-xl">Create branded QR codes, update destinations after print, and see what happens next—without juggling disconnected tools.</p></StaggerItem>
-            <StaggerItem className="mt-9 flex flex-col gap-3 sm:flex-row"><Button size="lg" className="group h-12 rounded-full px-7" render={<Link href="/signup" />}>Create a free QR <ArrowRight className="transition-transform group-hover:translate-x-1" /></Button><Button size="lg" variant="outline" className="h-12 rounded-full border-foreground/20 bg-background/50 px-7" render={<Link href="/pricing" />}>Explore plans</Button></StaggerItem>
-            <StaggerItem className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">{["No card required", "5 codes free forever", "Export-ready files"].map(item => <span key={item} className="flex items-center gap-2"><Check className="size-3.5 text-primary" />{item}</span>)}</StaggerItem>
+  return (
+    <div className="flex min-h-svh flex-col overflow-hidden bg-background">
+      <MarketingHeader />
+      <main className="flex-1">
+        {/* ─── Hero ─── */}
+        <section className="relative border-b border-border">
+          {/* Ambient glow blobs */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 size-[56rem] rounded-full bg-primary/8 blur-[130px]"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute top-20 right-[-8rem] size-[32rem] rounded-full bg-accent/10 blur-[100px]"
+          />
+
+          <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-6 py-20 lg:grid-cols-[1.15fr_.85fr] lg:py-28">
+            <StaggerContainer immediate className="max-w-3xl">
+              <StaggerItem className="mb-7 flex items-center gap-3">
+                <span className="h-px w-10 bg-primary" />
+                <span className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
+                  QR infrastructure for modern teams
+                </span>
+              </StaggerItem>
+
+              <StaggerItem>
+                <h1 className="font-heading text-[clamp(3rem,7vw,6.2rem)] leading-[.88] font-semibold tracking-[-0.055em] text-balance text-foreground">
+                  Make every scan{" "}
+                  <span className="bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent italic">
+                    count.
+                  </span>
+                </h1>
+              </StaggerItem>
+
+              <StaggerItem>
+                <p className="mt-8 max-w-xl text-lg leading-8 text-muted-foreground sm:text-xl">
+                  Create branded QR codes, update destinations after print, and see what happens
+                  next—without juggling disconnected tools.
+                </p>
+              </StaggerItem>
+
+              <StaggerItem className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  size="lg"
+                  className="group h-12 rounded-[14px] px-7"
+                  render={<Link href="/signup" />}
+                >
+                  Create a free QR{" "}
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-12 rounded-[14px] px-7"
+                  render={<Link href="/pricing" />}
+                >
+                  Explore plans
+                </Button>
+              </StaggerItem>
+
+              <StaggerItem className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">
+                {["No card required", "5 codes free forever", "Export-ready files"].map((item) => (
+                  <span key={item} className="flex items-center gap-2">
+                    <Check className="size-3.5 text-primary" />
+                    {item}
+                  </span>
+                ))}
+              </StaggerItem>
+            </StaggerContainer>
+
+            {/* Hero QR card */}
+            <div className="relative py-6 lg:translate-x-6">
+              <div
+                aria-hidden
+                className="absolute inset-8 rotate-6 rounded-[2.5rem] border border-primary/20 bg-primary/10"
+              />
+              <div className="relative rounded-[2.5rem] border border-border bg-card/90 px-8 py-14 shadow-[0_35px_80px_-35px_rgba(79,70,229,.18)] backdrop-blur-sm sm:px-14">
+                <HeroQrVisual />
+                <div className="mt-12 grid grid-cols-3 gap-3 border-t border-border pt-6 text-center">
+                  <Metric value="8.4k" label="scans" />
+                  <Metric value="31" label="regions" />
+                  <Metric value="+18%" label="this week" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Formats ticker ─── */}
+        <section className="border-b border-border bg-primary text-primary-foreground">
+          <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 md:flex-row md:items-center md:justify-between">
+            <p className="max-w-sm text-sm leading-6 text-primary-foreground/65">
+              One dependable workspace for packaging, venues, campaigns, menus, and product teams.
+            </p>
+            <div className="flex flex-wrap gap-x-8 gap-y-3">
+              {formats.map((format) => (
+                <span
+                  key={format}
+                  className="font-mono text-xs tracking-[.12em] text-primary-foreground/80 uppercase"
+                >
+                  {format}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Workflow steps ─── */}
+        <section id="workflow" className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
+          <FadeIn className="grid gap-8 lg:grid-cols-[.75fr_1.25fr] lg:items-end">
+            <div>
+              <Eyebrow>From idea to insight</Eyebrow>
+              <h2 className="mt-5 font-heading text-4xl leading-[1.02] font-semibold tracking-[-.045em] sm:text-6xl text-foreground">
+                A cleaner way to run QR campaigns.
+              </h2>
+            </div>
+            <p className="max-w-xl text-lg leading-8 text-muted-foreground lg:justify-self-end">
+              Build once, publish anywhere, and keep control long after the ink dries. QRForge keeps
+              design, destination, and performance in one place.
+            </p>
+          </FadeIn>
+
+          <StaggerContainer className="mt-16 grid gap-px overflow-hidden rounded-[24px] border border-border bg-border lg:grid-cols-3">
+            <WorkflowStep
+              number="01"
+              icon={Palette}
+              title="Shape your code"
+              text="Choose the content, add brand colors and a logo, then tune every detail with a live preview."
+            />
+            <WorkflowStep
+              number="02"
+              icon={ScanLine}
+              title="Print with confidence"
+              text="Download sharp SVG, PNG, or PDF files that stay readable from a table tent to a storefront."
+            />
+            <WorkflowStep
+              number="03"
+              icon={BarChart3}
+              title="Learn and adjust"
+              text="See scan activity across time, place, and device. Change a dynamic destination without a reprint."
+            />
           </StaggerContainer>
-          <div className="relative py-6 lg:translate-x-6"><div className="absolute inset-8 rotate-6 rounded-[2.5rem] border border-foreground/10 bg-[#e8b86d]" aria-hidden /><div className="relative rounded-[2.5rem] border border-foreground/15 bg-[#ece9df]/90 px-8 py-14 shadow-[0_35px_80px_-35px_rgba(25,40,31,.45)] backdrop-blur-sm sm:px-14"><HeroQrVisual /><div className="mt-12 grid grid-cols-3 gap-3 border-t border-foreground/10 pt-6 text-center"><Metric value="8.4k" label="scans" /><Metric value="31" label="regions" /><Metric value="+18%" label="this week" /></div></div></div>
-        </div>
-      </section>
+        </section>
 
-      <section className="border-b border-foreground/10 bg-[#18352b] text-[#f6f4ee]"><div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 md:flex-row md:items-center md:justify-between"><p className="max-w-sm text-sm leading-6 text-[#f6f4ee]/65">One dependable workspace for packaging, venues, campaigns, menus, and product teams.</p><div className="flex flex-wrap gap-x-8 gap-y-3">{formats.map(format => <span key={format} className="font-mono text-xs tracking-[.12em] text-[#f6f4ee]/80 uppercase">{format}</span>)}</div></div></section>
+        {/* ─── Analytics showcase ─── */}
+        <section id="features" className="border-y border-border bg-muted/40">
+          <div className="mx-auto grid max-w-7xl gap-14 px-6 py-24 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:py-32">
+            {/* Analytics mock */}
+            <FadeIn className="relative min-h-[480px] rounded-[24px] bg-[#1E1B4B] p-7 text-white shadow-xl shadow-primary/20 sm:p-10">
+              <div className="flex items-center justify-between border-b border-white/15 pb-6">
+                <div>
+                  <p className="text-xs tracking-[.15em] text-white/50 uppercase">Campaign</p>
+                  <p className="mt-1 font-medium">Spring menu launch</p>
+                </div>
+                <span className="rounded-full border border-emerald-400/30 bg-emerald-400/20 px-3 py-1 text-xs font-semibold text-emerald-300">
+                  Live
+                </span>
+              </div>
+              <div className="mt-10">
+                <p className="text-sm text-white/55">Total scans</p>
+                <p className="mt-1 font-heading text-6xl font-semibold tracking-tight">8,463</p>
+                <div className="mt-10 flex h-32 items-end gap-2" aria-hidden>
+                  {[34, 52, 46, 68, 58, 82, 76, 95, 72, 88, 100, 91].map((height, i) => (
+                    <span
+                      key={i}
+                      className="flex-1 rounded-t-sm bg-indigo-400 opacity-90"
+                      style={{ height: `${height}%` }}
+                    />
+                  ))}
+                </div>
+                <div className="mt-4 flex justify-between font-mono text-[10px] text-white/40">
+                  <span>MAY 01</span>
+                  <span>MAY 31</span>
+                </div>
+              </div>
+              <div className="absolute right-6 bottom-6 left-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur sm:right-auto sm:left-10 sm:w-64">
+                <Globe2 className="size-5 text-cyan-400" />
+                <div>
+                  <p className="text-xs text-white/50">Leading region</p>
+                  <p className="text-sm font-medium">London · 38.7%</p>
+                </div>
+              </div>
+            </FadeIn>
 
-      <section id="workflow" className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
-        <FadeIn className="grid gap-8 lg:grid-cols-[.75fr_1.25fr] lg:items-end"><div><Eyebrow>From idea to insight</Eyebrow><h2 className="mt-5 font-heading text-4xl leading-[1.02] font-semibold tracking-[-.045em] sm:text-6xl">A cleaner way to run QR campaigns.</h2></div><p className="max-w-xl text-lg leading-8 text-muted-foreground lg:justify-self-end">Build once, publish anywhere, and keep control long after the ink dries. QRForge keeps design, destination, and performance in one place.</p></FadeIn>
-        <StaggerContainer className="mt-16 grid gap-px overflow-hidden rounded-[2rem] border border-foreground/10 bg-foreground/10 lg:grid-cols-3"><WorkflowStep number="01" icon={Palette} title="Shape your code" text="Choose the content, add brand colors and a logo, then tune every detail with a live preview." /><WorkflowStep number="02" icon={ScanLine} title="Print with confidence" text="Download sharp SVG, PNG, or PDF files that stay readable from a table tent to a storefront." /><WorkflowStep number="03" icon={BarChart3} title="Learn and adjust" text="See scan activity across time, place, and device. Change a dynamic destination without a reprint." /></StaggerContainer>
-      </section>
+            <FadeIn>
+              <Eyebrow>Useful after you print</Eyebrow>
+              <h2 className="mt-5 max-w-xl font-heading text-4xl leading-[1.04] font-semibold tracking-[-.045em] sm:text-6xl text-foreground">
+                Data you can actually act on.
+              </h2>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
+                Know where attention comes from and which placements earn it. Clear reporting helps
+                teams compare campaigns without needing an analyst.
+              </p>
+              <div className="mt-10 grid gap-4 sm:grid-cols-2">
+                <MiniFeature icon={MousePointerClick} title="Live scan events" text="Follow momentum as campaigns go out." />
+                <MiniFeature icon={Globe2} title="Location signals" text="Understand broad regional demand." />
+                <MiniFeature icon={Layers3} title="Device breakdown" text="Tune landing pages for your audience." />
+                <MiniFeature icon={ShieldCheck} title="Privacy-minded" text="Collect insight without invasive profiles." />
+              </div>
+            </FadeIn>
+          </div>
+        </section>
 
-      <section id="features" className="border-y border-foreground/10 bg-[#ebe7dc]"><div className="mx-auto grid max-w-7xl gap-14 px-6 py-24 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:py-32">
-        <FadeIn className="relative min-h-[480px] rounded-[2.25rem] bg-[#18352b] p-7 text-[#f6f4ee] shadow-xl shadow-foreground/10 sm:p-10"><div className="flex items-center justify-between border-b border-white/15 pb-6"><div><p className="text-xs tracking-[.15em] text-white/50 uppercase">Campaign</p><p className="mt-1 font-medium">Spring menu launch</p></div><span className="rounded-full bg-[#d7f171] px-3 py-1 text-xs font-semibold text-[#18352b]">Live</span></div><div className="mt-10"><p className="text-sm text-white/55">Total scans</p><p className="mt-1 font-heading text-6xl font-semibold tracking-tight">8,463</p><div className="mt-10 flex h-32 items-end gap-2" aria-hidden>{[34,52,46,68,58,82,76,95,72,88,100,91].map((height,i) => <span key={i} className="flex-1 rounded-t-sm bg-[#d7f171] opacity-90" style={{height:`${height}%`}} />)}</div><div className="mt-4 flex justify-between font-mono text-[10px] text-white/40"><span>MAY 01</span><span>MAY 31</span></div></div><div className="absolute right-6 bottom-6 left-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur sm:right-auto sm:left-10 sm:w-64"><Globe2 className="size-5 text-[#d7f171]" /><div><p className="text-xs text-white/50">Leading region</p><p className="text-sm font-medium">London · 38.7%</p></div></div></FadeIn>
-        <FadeIn><Eyebrow>Useful after you print</Eyebrow><h2 className="mt-5 max-w-xl font-heading text-4xl leading-[1.04] font-semibold tracking-[-.045em] sm:text-6xl">Data you can actually act on.</h2><p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">Know where attention comes from and which placements earn it. Clear reporting helps teams compare campaigns without needing an analyst.</p><div className="mt-10 grid gap-4 sm:grid-cols-2"><MiniFeature icon={MousePointerClick} title="Live scan events" text="Follow momentum as campaigns go out." /><MiniFeature icon={Globe2} title="Location signals" text="Understand broad regional demand." /><MiniFeature icon={Layers3} title="Device breakdown" text="Tune landing pages for your audience." /><MiniFeature icon={ShieldCheck} title="Privacy-minded" text="Collect insight without invasive profiles." /></div></FadeIn>
-      </div></section>
+        {/* ─── Capabilities grid ─── */}
+        <section className="mx-auto max-w-7xl px-6 py-24 sm:py-32">
+          <FadeIn className="text-center">
+            <Eyebrow>Built for the whole operation</Eyebrow>
+            <h2 className="mx-auto mt-5 max-w-3xl font-heading text-4xl leading-[1.05] font-semibold tracking-[-.045em] sm:text-6xl text-foreground">
+              Small enough to start today. Capable enough to scale.
+            </h2>
+          </FadeIn>
+          <StaggerContainer className="mt-16 grid gap-5 md:grid-cols-12">
+            <Capability className="md:col-span-7" icon={Zap} label="Dynamic links" title="Change the destination, not the packaging." text="Fix a URL, rotate a seasonal menu, or redirect a finished campaign in a few clicks." />
+            <Capability className="md:col-span-5" icon={Upload} label="Bulk creation" title="Turn a spreadsheet into a campaign." text="Generate organized batches of unique QR codes and download them together." />
+            <Capability className="md:col-span-5" icon={Braces} label="Developer API" title="Build QR generation into your stack." text="Create, update, and retrieve codes programmatically with a straightforward REST API." link="/docs/api" />
+            <Capability className="md:col-span-7" icon={Sparkles} label="Brand controls" title="Recognition starts before the scan." text="Use your palette, logo, patterns, corner styles, and frames while preserving dependable readability." />
+          </StaggerContainer>
+        </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24 sm:py-32"><FadeIn className="text-center"><Eyebrow>Built for the whole operation</Eyebrow><h2 className="mx-auto mt-5 max-w-3xl font-heading text-4xl leading-[1.05] font-semibold tracking-[-.045em] sm:text-6xl">Small enough to start today. Capable enough to scale.</h2></FadeIn><StaggerContainer className="mt-16 grid gap-5 md:grid-cols-12"><Capability className="md:col-span-7" icon={Zap} label="Dynamic links" title="Change the destination, not the packaging." text="Fix a URL, rotate a seasonal menu, or redirect a finished campaign in a few clicks." /><Capability className="md:col-span-5" icon={Upload} label="Bulk creation" title="Turn a spreadsheet into a campaign." text="Generate organized batches of unique QR codes and download them together." /><Capability className="md:col-span-5" icon={Braces} label="Developer API" title="Build QR generation into your stack." text="Create, update, and retrieve codes programmatically with a straightforward REST API." link="/docs/api" /><Capability className="md:col-span-7" icon={Sparkles} label="Brand controls" title="Recognition starts before the scan." text="Use your palette, logo, patterns, corner styles, and frames while preserving dependable readability." /></StaggerContainer></section>
-
-      <section className="px-6 pb-24 sm:pb-32"><FadeIn className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-[#e8b86d] px-7 py-16 text-center sm:px-12 sm:py-24"><div className="paper-grid absolute inset-0 opacity-20" aria-hidden /><QrCode className="relative mx-auto size-10" /><h2 className="relative mx-auto mt-6 max-w-3xl font-heading text-4xl leading-none font-semibold tracking-[-.05em] sm:text-6xl">Your next campaign is one scan away.</h2><p className="relative mt-5 text-foreground/65">Create five QR codes for free. Keep them for as long as you like.</p><Button size="lg" className="relative mt-8 h-12 rounded-full bg-[#18352b] px-7 text-[#f6f4ee] hover:bg-[#23483b]" render={<Link href="/signup" />}>Start creating <ArrowRight /></Button></FadeIn></section>
-    </main><MarketingFooter />
-  </div>;
+        {/* ─── CTA banner ─── */}
+        <section className="px-6 pb-24 sm:pb-32">
+          <FadeIn className="relative mx-auto max-w-7xl overflow-hidden rounded-[24px] bg-gradient-to-br from-primary via-indigo-600 to-accent px-7 py-16 text-center sm:px-12 sm:py-24">
+            {/* Radial highlight */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,.15)_0%,transparent_70%)]"
+            />
+            <QrCode className="relative mx-auto size-10 text-white/80" />
+            <h2 className="relative mx-auto mt-6 max-w-3xl font-heading text-4xl leading-none font-semibold tracking-[-.05em] sm:text-6xl text-white">
+              Your next campaign is one scan away.
+            </h2>
+            <p className="relative mt-5 text-white/70">
+              Create five QR codes for free. Keep them for as long as you like.
+            </p>
+            <Button
+              size="lg"
+              className="relative mt-8 h-12 rounded-[14px] bg-white px-7 text-primary font-semibold hover:bg-white/90 shadow-lg"
+              render={<Link href="/signup" />}
+            >
+              Start creating <ArrowRight />
+            </Button>
+          </FadeIn>
+        </section>
+      </main>
+      <MarketingFooter />
+    </div>
+  );
 }
 
-function Metric({value,label}:{value:string;label:string}) { return <div><p className="font-heading text-xl font-semibold">{value}</p><p className="mt-1 text-[10px] tracking-[.12em] text-muted-foreground uppercase">{label}</p></div>; }
-function Eyebrow({children}:{children:React.ReactNode}) { return <p className="flex items-center justify-center gap-3 text-xs font-semibold tracking-[.18em] text-primary uppercase lg:justify-start"><span className="size-1.5 rounded-full bg-primary" />{children}</p>; }
-function WorkflowStep({number,icon:Icon,title,text}:{number:string;icon:typeof QrCode;title:string;text:string}) { return <StaggerItem><article className="group min-h-80 bg-[#f6f4ee] p-8 sm:p-10"><div className="flex items-start justify-between"><span className="font-mono text-xs text-muted-foreground">{number}</span><Icon className="size-7 text-primary transition-transform group-hover:-rotate-6 group-hover:scale-110" /></div><h3 className="mt-20 font-heading text-2xl font-semibold tracking-tight">{title}</h3><p className="mt-4 max-w-sm leading-7 text-muted-foreground">{text}</p></article></StaggerItem>; }
-function MiniFeature({icon:Icon,title,text}:{icon:typeof QrCode;title:string;text:string}) { return <div className="border-l border-foreground/15 py-2 pl-4"><Icon className="size-5 text-primary" /><h3 className="mt-4 font-semibold">{title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{text}</p></div>; }
-function Capability({className,icon:Icon,label,title,text,link}:{className?:string;icon:typeof QrCode;label:string;title:string;text:string;link?:string}) { const content=<article className="group h-full rounded-[2rem] border border-foreground/10 bg-background/50 p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-foreground/5 sm:p-10"><div className="flex items-center gap-3 text-xs font-semibold tracking-[.14em] text-primary uppercase"><Icon className="size-5" />{label}</div><h3 className="mt-12 max-w-xl font-heading text-3xl leading-tight font-semibold tracking-[-.035em]">{title}</h3><p className="mt-4 max-w-xl leading-7 text-muted-foreground">{text}</p>{link&&<span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold">Read the API docs <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></span>}</article>; return <StaggerItem className={className}>{link?<Link href={link} className="block h-full">{content}</Link>:content}</StaggerItem>; }
+/* ─── Sub-components ─── */
+
+function Metric({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <p className="font-heading text-xl font-semibold text-foreground">{value}</p>
+      <p className="mt-1 text-[10px] tracking-[.12em] text-muted-foreground uppercase">{label}</p>
+    </div>
+  );
+}
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex items-center gap-3 text-xs font-semibold tracking-[.18em] text-primary uppercase lg:justify-start">
+      <span className="size-1.5 rounded-full bg-primary" />
+      {children}
+    </p>
+  );
+}
+
+function WorkflowStep({
+  number,
+  icon: Icon,
+  title,
+  text,
+}: {
+  number: string;
+  icon: typeof QrCode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <StaggerItem>
+      <article className="group min-h-80 bg-card p-8 sm:p-10">
+        <div className="flex items-start justify-between">
+          <span className="font-mono text-xs text-muted-foreground">{number}</span>
+          <Icon className="size-7 text-primary transition-transform group-hover:-rotate-6 group-hover:scale-110" />
+        </div>
+        <h3 className="mt-20 font-heading text-2xl font-semibold tracking-tight text-foreground">{title}</h3>
+        <p className="mt-4 max-w-sm leading-7 text-muted-foreground">{text}</p>
+      </article>
+    </StaggerItem>
+  );
+}
+
+function MiniFeature({
+  icon: Icon,
+  title,
+  text,
+}: {
+  icon: typeof QrCode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="border-l-2 border-primary/30 py-2 pl-4">
+      <Icon className="size-5 text-primary" />
+      <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
+      <p className="mt-1 text-sm leading-6 text-muted-foreground">{text}</p>
+    </div>
+  );
+}
+
+function Capability({
+  className,
+  icon: Icon,
+  label,
+  title,
+  text,
+  link,
+}: {
+  className?: string;
+  icon: typeof QrCode;
+  label: string;
+  title: string;
+  text: string;
+  link?: string;
+}) {
+  const content = (
+    <article className="group h-full rounded-[24px] border border-border bg-card p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/8 sm:p-10">
+      <div className="flex items-center gap-3 text-xs font-semibold tracking-[.14em] text-primary uppercase">
+        <Icon className="size-5" />
+        {label}
+      </div>
+      <h3 className="mt-12 max-w-xl font-heading text-3xl leading-tight font-semibold tracking-[-.035em] text-foreground">
+        {title}
+      </h3>
+      <p className="mt-4 max-w-xl leading-7 text-muted-foreground">{text}</p>
+      {link && (
+        <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+          Read the API docs{" "}
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+        </span>
+      )}
+    </article>
+  );
+
+  return (
+    <StaggerItem className={className}>
+      {link ? (
+        <Link href={link} className="block h-full">
+          {content}
+        </Link>
+      ) : (
+        content
+      )}
+    </StaggerItem>
+  );
+}

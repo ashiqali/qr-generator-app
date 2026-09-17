@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BulkForm } from "./bulk-form";
 import { FadeIn } from "@/components/motion/fade-in";
-import { Upload, Sparkles, FileSpreadsheet } from "lucide-react";
+import { Sparkles, FileSpreadsheet } from "lucide-react";
 
 export default async function BulkPage() {
   const user = await getCurrentUser();

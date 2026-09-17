@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { QrCode, Plus, Globe, Wifi, Contact2, Sparkles, ArrowRight } from "lucide-react";
+import { QrCode, Plus, Globe, Wifi, Contact2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function EmptyState() {
